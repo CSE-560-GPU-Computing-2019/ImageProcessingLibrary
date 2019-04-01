@@ -327,7 +327,7 @@ int main()
 	seqFlipH(image, sequential, width, height, channels);
 	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
 	cout<< runTime <<" s" <<endl;
-	stbi_write_png("FlipVertical.png", width, height, channels, sequential, 0);
+	stbi_write_png("FlipHorizontal.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
@@ -466,7 +466,7 @@ int main()
 	cudaMalloc((void **) &deviceInputImageData1, width1 * height1 *channels * sizeof(unsigned char));
 	cudaMalloc((void **) &deviceInputImageData2, width2 * height2 *channels * sizeof(unsigned char));
 	cudaMalloc((void **) &deviceOutputImageData, width * height *channels * sizeof(unsigned char));
-	cudaMalloc((void **) &deviceOutputImageData1, (y2-y1+1)*(x2-x1+1) * imgchannels * sizeof(unsigned char));
+	cudaMalloc((void **) &deviceOutputImageData1, (y2-y1+1)*(x2-x1+1) * channels * sizeof(unsigned char));
 	cudaMalloc((void **) &deviceOutputImageData2, width2 * height2 *channels * sizeof(unsigned char));
 	cudaMemcpy(deviceInputImageData, image, width * height * channels * sizeof(unsigned char), cudaMemcpyHostToDevice);
 	cudaMemcpy(deviceInputImageData1, image1, width1 * height1 * channels * sizeof(unsigned char), cudaMemcpyHostToDevice);
@@ -494,7 +494,7 @@ int main()
 	//Brightness
 	cout << "Brightness elapsed in time: ";
 	cudaEventRecord(startEvent);
-	paraBrightness<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData, width, height, channels,128);
+	paraBrightness<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData, width, height, channels,-128);
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
@@ -632,7 +632,7 @@ int main()
 	//parCrop
 	cout << "parCrop elapsed in time: ";
 	cudaEventRecord(startEvent);
-	Para_crop = (unsigned char*)malloc((y2-y1+1)*(x2-x1+1)*sizeof(unsigned char)*imgchannels);
+	Para_crop = (unsigned char*)malloc((y2-y1+1)*(x2-x1+1)*sizeof(unsigned char)*channels);
 	parCrop<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData1, width, height, channels, x1,y1,x2,y2);
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
