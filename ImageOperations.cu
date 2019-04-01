@@ -41,7 +41,7 @@ __global__ void paraBrightness(const unsigned char *inputImage, unsigned char *o
     }   
 }
 
-/*__global__ void parFlipV(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels)
+__global__ void parFlipV(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels)
 {
     const unsigned char * inputImageData = inputImage;
     int i =  blockIdx.x* blockDim.x + threadIdx.x ;
@@ -152,7 +152,8 @@ __global__ void parXor(const unsigned char *inputImage1, const unsigned char *in
     }
 }
 
-/*__global__ void par_gaussian_filter(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels)
+
+__global__ void par_gaussian_filter(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels)
 {
    const unsigned char * inputImageData = inputImage;
    const unsigned char gaus[25]={1,4,7,4,1,4,16,26,16,4,7,26,41,26,7,4,16,26,16,4,1,4,7,4,1};
@@ -197,5 +198,6 @@ __global__ void par_mean_filter(const unsigned char *inputImage, unsigned char *
 			
                 outputImageData[( i *width + j)*channels + k] = (int) (temp/9.0);
             }
- } */
+ } 
+				
 

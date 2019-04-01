@@ -28,8 +28,8 @@ __global__ void parOr(const unsigned char *inputImage1, const unsigned char *inp
 
 __global__ void parXor(const unsigned char *inputImage1, const unsigned char *inputImage2,unsigned char *outputImageData, int width, int height, int channels);
 
-//__global__ void par_mean_filter(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels);
+__global__ void par_mean_filter(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels);
 
-//__global__ void par_gaussian_filter(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels);
+__global__ void par_gaussian_filter(const unsigned char *inputImage, unsigned char *outputImageData, int width, int height, int channels);
 
 #endif

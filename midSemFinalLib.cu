@@ -266,7 +266,7 @@ void seq_gaussian_filter(const unsigned char *inputImage, unsigned char *outputI
             }
         }
     }
-}
+ }
 
 
 int main()
@@ -276,13 +276,13 @@ int main()
     // Set Channel Value;
 	channels= 1;
 	
-	int width, height, bpp;
+	int width, height,width1,height1, bpp,bpp1;
    	unsigned char * sequential;
 	const unsigned char* image, *image1;
 	float runTime;
 		
     image = stbi_load( "image2048.png", &width, &height, &bpp, channels );
-    image1= stbi_load( "2048image.png", &width, &height, &bpp, channels );
+    image1= stbi_load( "2048color.png", &width1, &height1, &bpp1, channels );
 	   
     sequential = (unsigned char*)malloc(width*height*channels*sizeof(unsigned char));
 		
@@ -350,26 +350,42 @@ int main()
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//And
-	cout << "seqAnd elapsed in time: ";
-    begin_time = clock();   
-	seqAnd(image,image1, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
-	stbi_write_png("AndOperation.png", width, height, channels, sequential, 0);
+	if(width==width1 && height==height1) 
+        {
+	    cout << "seqAnd elapsed in time: ";
+        begin_time = clock();   
+	
+	 seqAnd(image,image1, sequential, width, height, channels);
+	 runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
+	 cout<< runTime <<" s" <<endl;
+	 stbi_write_png("AndOperation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
-	
+	}
+	else
+	{
+	 cout<< "ERROR! Images should be of same size for this Operation";
+	}
 	//OR
+	if(width==width1 && height==height1) 
+        {
 	cout << "seqOR elapsed in time: ";
-    begin_time = clock();   
+    	begin_time = clock(); 
+		
 	seqOr(image,image1, sequential, width, height, channels);
 	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
 	cout<< runTime <<" s" <<endl;
 	stbi_write_png("OROperation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
-	
+	}
+	else
+	{
+	 cout<< "ERROR! Images should be of same size for this Operation";
+	}
 	//XOR
+	if(width==width1 && height==height1) 
+        {
 	cout << "seqXOR elapsed in time: ";
     begin_time = clock();   
 	seqXor(image,image1, sequential, width, height, channels);
@@ -378,7 +394,12 @@ int main()
 	stbi_write_png("XOROperation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
-		
+	}
+	else
+	{
+	 cout<< "ERROR! Images should be of same size for this Operation";
+	}
+	
 	//NOT
 	cout << "seqNOT elapsed in time: ";
     begin_time = clock();   
@@ -418,11 +439,12 @@ int main()
 	stbi_write_png("GaussianFilter.png", width, height, channels, sequential, 0);
 	
 
-	cout << "----------------------------------" << endl;
+	cout << "*----------------------------------*" << endl;
 
 /******************************************************************************************************************/	
-	cudaEvent_t startEvent,stopEvent;
 	
+	cudaEvent_t startEvent,stopEvent;
+		
 	unsigned char *deviceInputImageData,*deviceInputImageData1;
     unsigned char *deviceOutputImageData;
     runTime=0.0;
@@ -436,7 +458,7 @@ int main()
 	cudaMalloc((void **) &deviceInputImageData1, width * height *channels * sizeof(float));
 	cudaMalloc((void **) &deviceOutputImageData, width * height *channels * sizeof(float));
 	cudaMemcpy(deviceInputImageData, image, width * height * channels * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(deviceInputImageData1, image1, width * height * channels * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(deviceInputImageData1, image1, width1 * height1 * channels * sizeof(float), cudaMemcpyHostToDevice);
 	
 	dim3 dimGrid(ceil((float) width/TILE_WIDTH), ceil((float) height/TILE_WIDTH));
 	dim3 dimBlock(TILE_WIDTH,TILE_WIDTH,1);
@@ -523,6 +545,8 @@ int main()
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//parAnd
+	if(width==width1 && height==height1) 
+        {
 	cout << "parAnd elapsed in time: ";
 	cudaEventRecord(startEvent);
 	parAnd<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceInputImageData1, deviceOutputImageData, width, height, channels);
@@ -534,9 +558,14 @@ int main()
 	stbi_write_png("parAnd.png", width, height, channels, Parallel, 0);
 	
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
+	}
+	else
+	{
+	 cout<< "ERROR! Images should be of same size for this Operation";
+	}
 	
 	//parOr
-	cout << "parAnd elapsed in time: ";
+	cout << "parOr elapsed in time: ";
 	cudaEventRecord(startEvent);
 	parOr<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceInputImageData1, deviceOutputImageData, width, height, channels);
 	cudaEventRecord(stopEvent);
@@ -549,6 +578,8 @@ int main()
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//parXor
+	if(width==width1 && height==height1) 
+        {
 	cout << "parXor elapsed in time: ";
 	cudaEventRecord(startEvent);
 	parXor<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceInputImageData1, deviceOutputImageData, width, height, channels);
@@ -560,8 +591,15 @@ int main()
 	stbi_write_png("parXor.png", width, height, channels, Parallel, 0);
 	
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
+	}
+	else
+	{
+	 cout<< "ERROR! Images should be of same size for this Operation";
+	}
 	
 	//parNot
+	if(width==width1 && height==height1) 
+        {
 	cout << "parNot elapsed in time: ";
 	cudaEventRecord(startEvent);
 	parNot<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData, width, height, channels);
@@ -573,6 +611,11 @@ int main()
 	stbi_write_png("parNot.png", width, height, channels, Parallel, 0);
 	
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
+	}
+	else
+	{
+	 cout<< "ERROR! Images should be of same size for this Operation";
+	}
 	
 	//parCrop
 	cout << "parCrop elapsed in time: ";
@@ -588,7 +631,7 @@ int main()
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//Gaussian filter
-	/*cout << "GaussianFilter elapsed in time: ";
+	cout << "GaussianFilter elapsed in time: ";
 	cudaEventRecord(startEvent);
 	par_gaussian_filter<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData, width, height, channels);
 	cudaEventRecord(stopEvent);
@@ -609,7 +652,7 @@ int main()
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
 	cout<< runTime/1000 <<" s"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
-	stbi_write_png("paraMeanFilter.png", width, height, channels, Parallel, 0); */
+	stbi_write_png("paraMeanFilter.png", width, height, channels, Parallel, 0); 
 	
     return 0;
 }
