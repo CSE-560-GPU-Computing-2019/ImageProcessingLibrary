@@ -274,20 +274,22 @@ int main()
 	int channels;
 	
     // Set Channel Value;
-	channels= 1;
+	channels= 3;
 	
-	int width, height,width1,height1, bpp,bpp1;
-   	unsigned char * sequential;
-	const unsigned char* image, *image1;
+	int width, height,width1,height1,width2,height2, bpp,bpp1, bpp2;
+   	unsigned char * sequential, *sequential2, *seq_img_crop;
+	const unsigned char* image, *image1, *image2;
 	float runTime;
 		
-    image = stbi_load( "image2048.png", &width, &height, &bpp, channels );
-    image1= stbi_load( "2048color.png", &width1, &height1, &bpp1, channels );
+    image = stbi_load( "img.png", &width, &height, &bpp, channels );
+    image1= stbi_load( "img1.png", &width1, &height1, &bpp1, channels );
+	image2= stbi_load( "img2.jpg", &width2, &height2, &bpp2, channels );
 	   
     sequential = (unsigned char*)malloc(width*height*channels*sizeof(unsigned char));
+	sequential2 = (unsigned char*)malloc(width2*height2*channels*sizeof(unsigned char));
 		
    	cout <<"SEQUENTIAL" << endl;
-	cout << "image dimensions: "<< width << "x" << height << endl;
+	//cout << "image dimensions: "<< width << "x" << height << endl;
 
 	//Inverse
 	cout << "Inverse elapsed in time: ";
@@ -412,31 +414,36 @@ int main()
 	
 	//Crop
 	cout << "CropOperation elapsed in time: ";
-    begin_time = clock();   
-	seqCrop(image, sequential, width, height, channels,100,100,100,100);
+    int x1=200;
+    int y1= 200;
+    int x2= 1500;
+    int y2=1500; 
+	begin_time = clock();
+	seq_img_crop = (unsigned char*)malloc((y2-y1+1)*(x2-x1+1)*sizeof(unsigned char)*channels);
+	seqCrop(image, seq_img_crop, width, height, channels,x1,y1,x2,y2);
 	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
 	cout<< runTime <<" s" <<endl;
-	stbi_write_png("CropOperation.png", width, height, channels, sequential, 0);
+	stbi_write_png("CropOperation.png", (y2-y1+1), (x2-x1+1), channels, seq_img_crop, 0);
 	
-	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
+	memset(sequential2,0,sizeof(width2*height2*channels*sizeof(unsigned char)));
 	
 	// Mean Filter
 	cout << "Mean Filter elapsed in time: ";
     begin_time = clock();   
-	seq_mean_filter(image1, sequential, width, height, channels);
+	seq_mean_filter(image2, sequential2, width2, height2, channels);
 	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
 	cout<< runTime <<" s" <<endl;
-	stbi_write_png("MeanFilter.png", width, height, channels, sequential, 0);
+	stbi_write_png("MeanFilter.jpg", width2, height2, channels, sequential2, 0);
 		
-	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
+	memset(sequential2,0,sizeof(width2*height2*channels*sizeof(unsigned char)));
 	
 	// Gaussian Filter
 	cout << "Gaussian Filter elapsed in time: ";
     begin_time = clock();   
-	seq_gaussian_filter(image1, sequential, width, height, channels);
+	seq_gaussian_filter(image2, sequential2, width2, height2, channels);
 	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
 	cout<< runTime <<" s" <<endl;
-	stbi_write_png("GaussianFilter.png", width, height, channels, sequential, 0);
+	stbi_write_png("GaussianFilter.jpg", width2, height2, channels, sequential2, 0);
 	
 
 	cout << "*----------------------------------*" << endl;
@@ -445,20 +452,25 @@ int main()
 	
 	cudaEvent_t startEvent,stopEvent;
 		
-	unsigned char *deviceInputImageData,*deviceInputImageData1;
-    unsigned char *deviceOutputImageData;
+	unsigned char *deviceInputImageData,*deviceInputImageData1, *deviceInputImageData2;
+    unsigned char *deviceOutputImageData, *deviceOutputImageData1, *deviceOutputImageData2;
     runTime=0.0;
 	cudaDeviceReset();
     cudaEventCreate(&startEvent);
 	cudaEventCreate(&stopEvent);	
 	unsigned char *Parallel = (unsigned char*)malloc(width*height*channels*sizeof(unsigned char));
+	unsigned char *Parallel2 = (unsigned char*)malloc(width2*height2*channels*sizeof(unsigned char));
+	unsigned char *Para_crop;
 	
-	
-	cudaMalloc((void **) &deviceInputImageData, width * height *channels * sizeof(float));
-	cudaMalloc((void **) &deviceInputImageData1, width * height *channels * sizeof(float));
-	cudaMalloc((void **) &deviceOutputImageData, width * height *channels * sizeof(float));
-	cudaMemcpy(deviceInputImageData, image, width * height * channels * sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(deviceInputImageData1, image1, width1 * height1 * channels * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMalloc((void **) &deviceInputImageData, width * height *channels * sizeof(unsigned char));
+	cudaMalloc((void **) &deviceInputImageData1, width1 * height1 *channels * sizeof(unsigned char));
+	cudaMalloc((void **) &deviceInputImageData2, width2 * height2 *channels * sizeof(unsigned char));
+	cudaMalloc((void **) &deviceOutputImageData, width * height *channels * sizeof(unsigned char));
+	cudaMalloc((void **) &deviceOutputImageData1, (y2-y1+1)*(x2-x1+1) * imgchannels * sizeof(unsigned char));
+	cudaMalloc((void **) &deviceOutputImageData2, width2 * height2 *channels * sizeof(unsigned char));
+	cudaMemcpy(deviceInputImageData, image, width * height * channels * sizeof(unsigned char), cudaMemcpyHostToDevice);
+	cudaMemcpy(deviceInputImageData1, image1, width1 * height1 * channels * sizeof(unsigned char), cudaMemcpyHostToDevice);
+	cudaMemcpy(deviceInputImageData2, image2, width2 * height2 * channels * sizeof(unsigned char), cudaMemcpyHostToDevice);
 	
 	dim3 dimGrid(ceil((float) width/TILE_WIDTH), ceil((float) height/TILE_WIDTH));
 	dim3 dimBlock(TILE_WIDTH,TILE_WIDTH,1);
@@ -620,39 +632,40 @@ int main()
 	//parCrop
 	cout << "parCrop elapsed in time: ";
 	cudaEventRecord(startEvent);
-	parCrop<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData, width, height, channels, 100, 100, 100, 100);
+	Para_crop = (unsigned char*)malloc((y2-y1+1)*(x2-x1+1)*sizeof(unsigned char)*imgchannels);
+	parCrop<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData1, width, height, channels, x1,y1,x2,y2);
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
 	cout<< runTime/1000 <<" s"<<endl;
-	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
-	stbi_write_png("parCrop.png", width, height, channels, Parallel, 0);
+	cudaMemcpy(Para_crop, deviceOutputImageData1, (y2-y1+1)*(x2-x1+1)* channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
+	stbi_write_png("parCrop.png", (y2-y1+1), (x2-x1+1), channels, Para_crop, 0);
 	
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//Gaussian filter
 	cout << "GaussianFilter elapsed in time: ";
 	cudaEventRecord(startEvent);
-	par_gaussian_filter<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData, width, height, channels);
+	par_gaussian_filter<<<dimGrid,dimBlock>>>(deviceInputImageData2, deviceOutputImageData2, width2, height2, channels);
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
 	cout<< runTime/1000 <<" s"<<endl;
-	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
-	stbi_write_png("paraGaussianFilter.png", width, height, channels, Parallel, 0);
+	cudaMemcpy(Parallel2, deviceOutputImageData2, width2 * height2 * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
+	stbi_write_png("paraGaussianFilter.jpg", width2, height2, channels, Parallel2, 0);
 	
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//Mean filter
 	cout << "MeanFilter elapsed in time: ";
 	cudaEventRecord(startEvent);
-	par_mean_filter<<<dimGrid,dimBlock>>>(deviceInputImageData, deviceOutputImageData, width, height, channels);
+	par_mean_filter<<<dimGrid,dimBlock>>>(deviceInputImageData2, deviceOutputImageData2, width2, height2, channels);
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
 	cout<< runTime/1000 <<" s"<<endl;
-	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
-	stbi_write_png("paraMeanFilter.png", width, height, channels, Parallel, 0); 
+	cudaMemcpy(Parallel2, deviceOutputImageData2, width2 * height2 * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
+	stbi_write_png("paraMeanFilter.jpg", width2, height2, channels, Parallel2, 0); 
 	
     return 0;
 }
