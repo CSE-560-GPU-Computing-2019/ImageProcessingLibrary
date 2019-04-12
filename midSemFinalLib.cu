@@ -13,9 +13,7 @@
 
 #define TILE_WIDTH 16
 
-
 using namespace std;
-
 
 void seqInverse(const unsigned char *inputImage, unsigned char *outputImageData, int dataSizeX, int dataSizeY, int channels)
 {
@@ -281,10 +279,14 @@ int main()
 	const unsigned char* image, *image1, *image2;
 	float runTime;
 		
-    image = stbi_load( "img.png", &width, &height, &bpp, channels );
+    /*image = stbi_load( "img.png", &width, &height, &bpp, channels );
     image1= stbi_load( "img1.png", &width1, &height1, &bpp1, channels );
-	image2= stbi_load( "img2.jpg", &width2, &height2, &bpp2, channels );
-	   
+	image2= stbi_load( "img2.jpg", &width2, &height2, &bpp2, channels );*/
+	
+	image = stbi_load( "lena128.png", &width, &height, &bpp, channels );
+    image1= stbi_load( "lenaFlip128.png", &width1, &height1, &bpp1, channels );
+	image2= stbi_load( "lena128.png", &width2, &height2, &bpp2, channels );
+	
     sequential = (unsigned char*)malloc(width*height*channels*sizeof(unsigned char));
 	sequential2 = (unsigned char*)malloc(width2*height2*channels*sizeof(unsigned char));
 		
@@ -295,8 +297,8 @@ int main()
 	cout << "Inverse elapsed in time: ";
 	 clock_t begin_time = clock();	
 	seqInverse(image, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s"<<endl;
+	runTime = (float)( clock() - begin_time ) / (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms"<<endl;
 	stbi_write_png("Inverse.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -305,8 +307,8 @@ int main()
 	cout << "Brightness elapsed in time: ";
     begin_time = clock();   
 	seqBrightness(image, sequential, width, height, channels,-128); 
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) / ( CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("Brightness.png", width, height, channels, sequential, 0);	
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -315,8 +317,8 @@ int main()
 	cout << "seqFlipV elapsed in time: ";
     begin_time = clock();   
 	seqFlipV(image, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("FlipVertical.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -325,8 +327,8 @@ int main()
 	cout << "seqFlipH elapsed in time: ";
     begin_time = clock();   
 	seqFlipH(image, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("FlipHorizontal.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -335,8 +337,8 @@ int main()
 	cout << "seqRotateAnti elapsed in time: ";
     begin_time = clock();   
 	seqRotateAnti(image, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("AntiClockRotation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -345,8 +347,8 @@ int main()
 	cout << "seqRotateClock elapsed in time: ";
     begin_time = clock();   
 	seqRotateClock(image, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("ClockRotation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -358,8 +360,8 @@ int main()
         begin_time = clock();   
 	
 	 seqAnd(image,image1, sequential, width, height, channels);
-	 runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	 cout<< runTime <<" s" <<endl;
+	 runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	 cout<< runTime <<" ms" <<endl;
 	 stbi_write_png("AndOperation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -375,8 +377,8 @@ int main()
     	begin_time = clock(); 
 		
 	seqOr(image,image1, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("OROperation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -391,8 +393,8 @@ int main()
 	cout << "seqXOR elapsed in time: ";
     begin_time = clock();   
 	seqXor(image,image1, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("XOROperation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
@@ -406,23 +408,23 @@ int main()
 	cout << "seqNOT elapsed in time: ";
     begin_time = clock();   
 	seqNot(image, sequential, width, height, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("NOTOperation.png", width, height, channels, sequential, 0);
 	
 	memset(sequential,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//Crop
 	cout << "CropOperation elapsed in time: ";
-    int x1=200;
-    int y1= 200;
-    int x2= 1500;
-    int y2=1500; 
+    int x1= 50;
+    int y1= 50;
+    int x2= 100;
+    int y2= 100; 
 	begin_time = clock();
 	seq_img_crop = (unsigned char*)malloc((y2-y1+1)*(x2-x1+1)*sizeof(unsigned char)*channels);
 	seqCrop(image, seq_img_crop, width, height, channels,x1,y1,x2,y2);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
 	stbi_write_png("CropOperation.png", (y2-y1+1), (x2-x1+1), channels, seq_img_crop, 0);
 	
 	memset(sequential2,0,sizeof(width2*height2*channels*sizeof(unsigned char)));
@@ -431,9 +433,9 @@ int main()
 	cout << "Mean Filter elapsed in time: ";
     begin_time = clock();   
 	seq_mean_filter(image2, sequential2, width2, height2, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
-	stbi_write_png("MeanFilter.jpg", width2, height2, channels, sequential2, 0);
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
+	stbi_write_png("MeanFilter.png", width2, height2, channels, sequential2, 0);
 		
 	memset(sequential2,0,sizeof(width2*height2*channels*sizeof(unsigned char)));
 	
@@ -441,9 +443,9 @@ int main()
 	cout << "Gaussian Filter elapsed in time: ";
     begin_time = clock();   
 	seq_gaussian_filter(image2, sequential2, width2, height2, channels);
-	runTime = (float)( clock() - begin_time ) /  CLOCKS_PER_SEC;
-	cout<< runTime <<" s" <<endl;
-	stbi_write_png("GaussianFilter.jpg", width2, height2, channels, sequential2, 0);
+	runTime = (float)( clock() - begin_time ) /  (CLOCKS_PER_SEC/1000);
+	cout<< runTime <<" ms" <<endl;
+	stbi_write_png("GaussianFilter.png", width2, height2, channels, sequential2, 0);
 	
 
 	cout << "*----------------------------------*" << endl;
@@ -473,6 +475,7 @@ int main()
 	cudaMemcpy(deviceInputImageData2, image2, width2 * height2 * channels * sizeof(unsigned char), cudaMemcpyHostToDevice);
 	
 	dim3 dimGrid(ceil((float) width/TILE_WIDTH), ceil((float) height/TILE_WIDTH));
+	dim3 dimGrid2(ceil((float) width2/TILE_WIDTH), ceil((float) height2/TILE_WIDTH));
 	dim3 dimBlock(TILE_WIDTH,TILE_WIDTH,1);
 	
 	cout <<"PARALLEL" << endl;
@@ -485,7 +488,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("paraInverse.png", width, height, channels, Parallel, 0);
 	
@@ -498,7 +501,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("paraBrightness.png", width, height, channels, Parallel, 0);
 	
@@ -511,7 +514,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parFlipV.png", width, height, channels, Parallel, 0);
 	
@@ -524,7 +527,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parFlipH.png", width, height, channels, Parallel, 0);
 	
@@ -537,7 +540,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parRotateAnti.png", width, height, channels, Parallel, 0);
 	
@@ -550,7 +553,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parRotateClock.png", width, height, channels, Parallel, 0);
 	
@@ -565,7 +568,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parAnd.png", width, height, channels, Parallel, 0);
 	
@@ -583,7 +586,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parOr.png", width, height, channels, Parallel, 0);
 	
@@ -598,7 +601,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parXor.png", width, height, channels, Parallel, 0);
 	
@@ -618,7 +621,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel, deviceOutputImageData, width * height * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parNot.png", width, height, channels, Parallel, 0);
 	
@@ -637,7 +640,7 @@ int main()
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Para_crop, deviceOutputImageData1, (y2-y1+1)*(x2-x1+1)* channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	stbi_write_png("parCrop.png", (y2-y1+1), (x2-x1+1), channels, Para_crop, 0);
 	
@@ -646,33 +649,26 @@ int main()
 	//Gaussian filter
 	cout << "GaussianFilter elapsed in time: ";
 	cudaEventRecord(startEvent);
-	par_gaussian_filter<<<dimGrid,dimBlock>>>(deviceInputImageData2, deviceOutputImageData2, width2, height2, channels);
+	par_gaussian_filter<<<dimGrid2,dimBlock>>>(deviceInputImageData2, deviceOutputImageData2, width2, height2, channels);
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel2, deviceOutputImageData2, width2 * height2 * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
-	stbi_write_png("paraGaussianFilter.jpg", width2, height2, channels, Parallel2, 0);
+	stbi_write_png("paraGaussianFilter.png", width2, height2, channels, Parallel2, 0);
 	
 	memset(Parallel,0,sizeof(width*height*channels*sizeof(unsigned char)));
 	
 	//Mean filter
 	cout << "MeanFilter elapsed in time: ";
 	cudaEventRecord(startEvent);
-	par_mean_filter<<<dimGrid,dimBlock>>>(deviceInputImageData2, deviceOutputImageData2, width2, height2, channels);
+	par_mean_filter<<<dimGrid2,dimBlock>>>(deviceInputImageData2, deviceOutputImageData2, width2, height2, channels);
 	cudaEventRecord(stopEvent);
 	cudaEventSynchronize(stopEvent);
 	cudaEventElapsedTime(&runTime,startEvent, stopEvent);
-	cout<< runTime/1000 <<" s"<<endl;
+	cout<< runTime <<" ms"<<endl;
 	cudaMemcpy(Parallel2, deviceOutputImageData2, width2 * height2 * channels * sizeof(unsigned char), cudaMemcpyDeviceToHost);
-	stbi_write_png("paraMeanFilter.jpg", width2, height2, channels, Parallel2, 0); 
+	stbi_write_png("paraMeanFilter.png", width2, height2, channels, Parallel2, 0); 
 	
     return 0;
 }
-
-
-
-
-
-
-
